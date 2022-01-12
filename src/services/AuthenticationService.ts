@@ -12,26 +12,18 @@ import { EmailService } from "./EmailService";
 
 export class AuthenticationService {
 
-    // '/user/register',
-    // '/user/auth',
-    // '/user/forget-pasword',
-    // '/user/verify-email',
-    // '/user/send-otp',
-    // '/user/verify-otp',
-    // '/user/update-password',
-
     async register(request: any): Promise<DRResponse> {
         try {
             let user: UserDetails = new UserDetails(request);
             if(!user.$name) { throw new InvalidInputError('name is required'); }
             if(!user.$emailAddress) { throw new InvalidInputError('emailAddress is required'); }
             if(!user.$password) { throw new InvalidInputError('password is required'); }
-            
+            if(!user.$userType) { throw new InvalidInputError('userType is required'); }
+
+            if(![UserType.USER, UserType.LIVWELL, UserType.INSURER].includes(user.$userType)) { throw new InvalidInputError("userType is invalid"); }
             // if email is already registerd
             let registedUser: any[] = await new MongoDBUtils().filter({emailAddress: user.$emailAddress}, 'users');
             if(registedUser && registedUser.length > 0) { throw new InvalidInputError('This email address already registered.'); } 
-
-            user.$userType = UserType.USER;
             // user.$createdOn = new Date();
             user.$password = await bcrypt.hash(user.$password, 8);
             // user.$emailVerificationToken = randomstring.generate({length: 64, charset: 'alphanumeric'});
@@ -50,6 +42,7 @@ export class AuthenticationService {
             // fetching user using email id
             if(!request.emailAddress) { throw new InvalidInputError('emailAddress is required'); }
             if(!request.password) { throw new InvalidInputError('password is required'); }
+            if(!request.userType) { throw new InvalidInputError('userType is required'); }
             
             let registedUsers: any[] = await new MongoDBUtils().filter({emailAddress: request.emailAddress}, 'users');
             if(!registedUsers || registedUsers.length !== 1) { throw new InvalidInputError('In-correct email-address'); }
@@ -58,10 +51,9 @@ export class AuthenticationService {
             let isPasswordMatched = await bcrypt.compare(request.password, user.$password);
             if(!isPasswordMatched) { throw new InvalidInputError('In-correct password');  }
 
-            // if([AccountStatus.DISABLED].includes(user.$accountStatus)) { throw new InvalidInputError('Your account is disabled.'); }
-            
-            //generating json token
-            const token = this.generateToken(user.$name, user.$emailAddress, UserType.USER);
+            // Generating JSON token
+
+            const token = this.generateToken(user.$name, user.$userId, UserType.USER);
             return new DRResponse(200, 'User has been logged in successfullly', null, {token: token});
         } catch (error) {
             console.log(error);
@@ -69,24 +61,12 @@ export class AuthenticationService {
         }
     }
 
-    async resetPassword() {
-
-    }
-
-    async verifyResetEmail() {
-
-    }
-
-    async updatePassword() {
-
-    }
-
-    private generateToken(name: string, emailAddress: string, accountType: UserType) {
+    private generateToken(name: string, userId: string, userType: UserType) {
         return jwt.sign(
             {
                 name: name,
-                emailAddress: emailAddress,
-                accountType: accountType
+                userId: userId,
+                userType: userType
             },
             process.env.JWT_SECRET, { expiresIn: '2h', algorithm: 'HS256' }
         );

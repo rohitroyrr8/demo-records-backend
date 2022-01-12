@@ -1,4 +1,5 @@
-import { UserType } from "aws-sdk/clients/workdocs";
+
+import { UserType } from "../enums/UserType";
 import { CommonUtils } from "../utils/CommonUtils";
 import { Cover } from "./Cover";
 

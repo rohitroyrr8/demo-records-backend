@@ -5,14 +5,32 @@ export class SettlementInfo {
     private settlementBy: string;
     private settlementDate: Date;
     private settlementDocument: ClaimDocument;
+    private settlementReference: string;
     private settlemntBankDetails: BankDetails;
 
     constructor(obj: any) {
         this.settlementBy = obj.settlementBy;
+        this.settlementReference = obj.settlementReference;
         this.settlementDate = new Date(obj.settlementDate);
         this.settlementDocument = new ClaimDocument(obj.settlementDocument);
         this.settlemntBankDetails = new BankDetails(obj.settlemntBankDetails);
     }
+
+    /**
+     * Getter $settlementReference
+     * @return {string}
+     */
+	public get $settlementReference(): string {
+		return this.settlementReference;
+	}
+
+    /**
+     * Setter $settlementReference
+     * @param {string} value
+     */
+	public set $settlementReference(value: string) {
+		this.settlementReference = value;
+	}
 
 
     /**
