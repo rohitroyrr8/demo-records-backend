@@ -1,5 +1,5 @@
 import { AdmisiblityCriteria } from "./AdmisiblityCriteria";
-import { AmountLimit } from "./AMountLImit";
+import { AmountLimit } from "./AmountLimit";
 import { PercentageLimit } from "./PercentageLImit";
 
 export class PayablityCriteria {

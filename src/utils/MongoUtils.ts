@@ -2,7 +2,6 @@ const { MongoClient } = require("mongodb");
 
 import log4js = require('log4js');
 const logger = log4js.getLogger('MongoDB Utils');
-import { getConstantValue } from "typescript";
 import { InvalidInputError } from '../errors/InvalidInputError';
 
 export class MongoDBUtils {
